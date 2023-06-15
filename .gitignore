@@ -1,0 +1,7 @@
+*.jpg
+.ipynb_checkpoints/
+**/**/__pycache__/
+.vscode
+*.zip
+*.tar.gz
+*.mat
