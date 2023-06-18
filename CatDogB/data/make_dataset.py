@@ -1,4 +1,8 @@
-"""Downloads and extract data for the model."""
+"""Downloads and extract data for the model.
+
+Can be used as a python script to store the data in a specific directory.
+"""
+import argparse
 import gdown
 import random
 import requests
@@ -67,9 +71,7 @@ def extract_data(source: str,
     if source_type == 'direct':
         output_name = source.split('/')[-1]
 
-    if destination.is_dir():
-        print(f"{destination} directory exists.")
-    else:
+    if not destination.is_dir():
         print(f"Did not find {destination} directory, creating it...")
         destination.mkdir(parents=True, exist_ok=True)
 
@@ -81,31 +83,46 @@ def extract_data(source: str,
     zipfile_path = dwn_dict[source_type](source, destination)
     # In case the file has multiple suffixes like ".tar.gz".
     file_path = zipfile_path.name.split('.')[0]
+    dir_path = zipfile_path.parent.joinpath(file_path)
 
     print(f"Decompressing {zipfile_path.name} data...") 
     if ''.join(zipfile_path.suffixes) == ".tar.gz":
         with tarfile.open(zipfile_path, "r:gz") as tar:
-            tar.extractall(file_path)
+            tar.extractall(dir_path)
     else:
         with zipfile.ZipFile(zipfile_path, "r") as zip_ref:
-            zip_ref.extractall(file_path)
+            zip_ref.extractall(dir_path)
         
     if remove_zip:
         zipfile_path.unlink()
 
-    return Path(file_path)
+    return dir_path
 
 if __name__ == "__main__":
-    zip_url = 'https://thor.robots.ox.ac.uk/~vgg/data/pets/images.tar.gz'
-    imgs_path = extract_data(zip_url) / 'images'
+    parser = argparse.ArgumentParser(
+        prog='Oxford-IIIT Pet Dataset Maker',
+        description=('Downloads and decompresses the images found in '
+                     'the Oxford-IIIT Pet Dataset')
+    )
+    parser.add_argument(
+        '-f', '--filepath',
+        default='.',
+        type=Path,
+        help='Filepath to where the data will be downloaded and decompressed.',
+        nargs='?',
+        required=False
+    )
+    args = parser.parse_args()
 
+    zip_url = 'https://thor.robots.ox.ac.uk/~vgg/data/pets/images.tar.gz'
+    imgs_path = extract_data(zip_url, destination=args.filepath) / 'images'
     print("Extracting classes info...")
     class_names = {' '.join(p.name.split('_')[:-1])
                    for p in imgs_path.glob('*.jpg')}
     breeds = {br_name: [] for br_name in class_names}
 
     print("Creating modelling structure...")
-    data_path = Path('./restrc-oxford-iiit-pet')
+    data_path = args.filepath / 'restrc-oxford-iiit-pet'
     data_path.mkdir(parents=True, exist_ok=True)
     train_path = data_path / 'train'
     train_path.mkdir(parents=True, exist_ok=True)
@@ -142,4 +159,4 @@ if __name__ == "__main__":
             path = ts_path / img.name
             copy(img, path)
     print("Cleaning...")
-    rmtree(imgs_path.parent)
+    rmtree(imgs_path.resolve().parent)

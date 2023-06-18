@@ -57,7 +57,7 @@ def save_model(model: torch.nn.Module,
 
 def plot_loss_curves(results: pd.DataFrame,
                      model_name: str,
-                     save_path: Optional[str | Path],
+                     save_path: Optional[str | Path] = Path('.'),
                      show: Optional[bool] = True):
     """Plots training curves of a results DataFrame.
 
@@ -105,12 +105,14 @@ def plot_loss_curves(results: pd.DataFrame,
     plt.xlabel('Epochs')
     plt.legend()
     plt.title(title)
-    if show:
-        plt.show()
 
     if save_path:
         save_path = Path(save_path).joinpath(title).with_suffix('.png')
         plt.savefig(save_path)
+
+    if show:
+        plt.show()
+
 
 
 def create_writer(
@@ -136,9 +138,26 @@ def create_writer(
     Returns:
         A SummaryWriter instance ready to track the experiment findings.
     """
-    timestamp = date.today().isoformat()
+    timestamp = date.today()
     log_dir /= f'runs/{timestamp}/{experiment_name}/{model_name}'
     if extra:
         log_dir /= extra
         
     return tensorboard.SummaryWriter(log_dir=log_dir)
+
+
+def transform_image(image_path: Path | str,
+                    transform: torchvision.transforms.transforms.Compose,
+                    device: torch.device) -> Tuple[Image.Image, torch.Tensor]:
+    """Transforms an image found in the given path with the passed transform.
+    
+    Returns:
+        A tuple containing the opened image and its transformation."""
+    with Image.open(Path(image_path)) as image:
+        return (
+            image, 
+            transform(image)
+            .unsqueeze(dim=0)
+            .to(device)
+        )
+    
