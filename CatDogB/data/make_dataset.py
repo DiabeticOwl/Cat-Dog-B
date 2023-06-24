@@ -112,10 +112,27 @@ if __name__ == "__main__":
         nargs='?',
         required=False
     )
+    parser.add_argument(
+        '--extra-breeds',
+        default=None,
+        type=Path,
+        help='Filepath to where the images of extra breeds will be.',
+        nargs='?',
+        required=False
+    )
     args = parser.parse_args()
 
     zip_url = 'https://thor.robots.ox.ac.uk/~vgg/data/pets/images.tar.gz'
     imgs_path = extract_data(zip_url, destination=args.filepath) / 'images'
+    if args.extra_breeds:
+        print("Examining extra breeds...")
+        ex_imgs_p = args.extra_breeds
+        if ex_imgs_p.suffix == '.zip':
+            with zipfile.ZipFile(ex_imgs_p, "r") as zip_ref:
+                zip_ref.extractall(ex_imgs_p.parent)
+        for ex_img in ex_imgs_p.with_suffix('').glob('*/*.jpg'):
+            copy(ex_img, imgs_path)
+
     print("Extracting classes info...")
     class_names = {' '.join(p.name.split('_')[:-1])
                    for p in imgs_path.glob('*.jpg')}
