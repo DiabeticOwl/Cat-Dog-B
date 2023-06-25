@@ -58,7 +58,8 @@ def save_model(model: torch.nn.Module,
 def plot_loss_curves(results: pd.DataFrame,
                      model_name: str,
                      save_path: Optional[str | Path] = Path('.'),
-                     show: Optional[bool] = True):
+                     show: Optional[bool] = True,
+                     save_results: Optional[bool] = False):
     """Plots training curves of a results DataFrame.
 
     Args:
@@ -68,6 +69,9 @@ def plot_loss_curves(results: pd.DataFrame,
             the figure will be saved.
         show: Optional boolean determining whether show the figure or not.
             Useful when saving multiple plots in a loop.
+        save_results: Optional boolean determining whether the passed results
+            dataframe will be saved in the same location as the save_path
+            argument or not.
     """
     
     # Get the loss values of the results dictionary (training and test)
@@ -95,6 +99,7 @@ def plot_loss_curves(results: pd.DataFrame,
     plt.plot(epochs, test_loss, label='test_loss')
     plt.title('Loss')
     plt.xlabel('Epochs')
+    plt.ylim(0, 100)
     plt.legend()
 
     # Plot metric
@@ -103,8 +108,10 @@ def plot_loss_curves(results: pd.DataFrame,
     plt.plot(epochs, test_metric, label='test_metric')
     plt.title('metric')
     plt.xlabel('Epochs')
+    plt.ylim(0, 100)
     plt.legend()
-    plt.title(title)
+    
+    plt.suptitle(title)
 
     if save_path:
         save_path = Path(save_path).joinpath(title).with_suffix('.png')
@@ -113,6 +120,9 @@ def plot_loss_curves(results: pd.DataFrame,
     if show:
         plt.show()
 
+    if save_results:
+        save_path = save_path.parent / f'{title}.csv'
+        results.to_csv(save_path)
 
 
 def create_writer(
