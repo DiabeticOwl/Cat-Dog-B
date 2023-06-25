@@ -88,7 +88,7 @@ def plot_loss_curves(results: pd.DataFrame,
         raise IndexError("There are no values in the past dataframe with a "
                          f"model named like '{model_name}'.")
     title = f"{model_name} Loss and Metric Curves"
-    epochs = range(epochs)
+    epochs = range(1, epochs + 1)
 
     # Setup a plot 
     plt.figure(figsize=(15, 7))
