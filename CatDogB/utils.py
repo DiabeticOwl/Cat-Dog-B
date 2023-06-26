@@ -9,13 +9,13 @@ import torchvision
 from datetime import date
 from pathlib import Path
 from PIL import Image
-from torch.utils import data, tensorboard
+from torch.utils import tensorboard
 from typing import Optional, Tuple
 
 
 def estimate_experiment_time(start: float, end: float) -> float:
     """Estimates the difference between start and end time on an experiment.
-    
+
     Returns:
         A float number representing how many seconds lasted the experiment.
     """
@@ -30,8 +30,8 @@ def save_model(model: torch.nn.Module,
     Args:
         model: A target PyTorch model to save.
         target_dir: A directory for saving the model to.
-        model_name: A filename for the saved model. Should include either ".pth"
-            or ".pt" as the file extension.
+        model_name: A filename for the saved model. Should include either
+            ".pth" or ".pt" as the file extension.
 
     Example usage:
         save_model(model=model_0,
@@ -73,7 +73,7 @@ def plot_loss_curves(results: pd.DataFrame,
             dataframe will be saved in the same location as the save_path
             argument or not.
     """
-    
+
     # Get the loss values of the results dictionary (training and test)
     train_loss = results['train_loss']
     test_loss = results['test_loss']
@@ -90,7 +90,7 @@ def plot_loss_curves(results: pd.DataFrame,
     title = f"{model_name} Loss and Metric Curves"
     epochs = range(1, epochs + 1)
 
-    # Setup a plot 
+    # Setup a plot
     plt.figure(figsize=(15, 7))
 
     # Plot loss
@@ -110,7 +110,7 @@ def plot_loss_curves(results: pd.DataFrame,
     plt.xlabel('Epochs')
     plt.ylim(0, 100)
     plt.legend()
-    
+
     plt.suptitle(title)
 
     if save_path:
@@ -132,10 +132,10 @@ def create_writer(
         log_dir: Optional[Path] = Path('.')
 ) -> tensorboard.writer.SummaryWriter:
     """Creates a SummaryWriter instance that will track the ran experiment.
-    
+
     SummaryWriter belongs to the torch.utils.tensorboard module. This
     instance will track the experiment that an specific model will run through.
-    
+
     Args:
         experiment_name: String that represents the name of the experiment.
         model_name: String that represents the name of the model that will
@@ -144,7 +144,7 @@ def create_writer(
             the experiment.
         log_dir: Path that points to where the logs directory will be found.
             By default the current directory will be used.
-        
+
     Returns:
         A SummaryWriter instance ready to track the experiment findings.
     """
@@ -152,7 +152,7 @@ def create_writer(
     log_dir /= f'runs/{timestamp}/{experiment_name}/{model_name}'
     if extra:
         log_dir /= extra
-        
+
     return tensorboard.SummaryWriter(log_dir=log_dir)
 
 
@@ -160,14 +160,13 @@ def transform_image(image_path: Path | str,
                     transform: torchvision.transforms.transforms.Compose,
                     device: torch.device) -> Tuple[Image.Image, torch.Tensor]:
     """Transforms an image found in the given path with the passed transform.
-    
+
     Returns:
         A tuple containing the opened image and its transformation."""
     with Image.open(Path(image_path)) as image:
         return (
-            image, 
+            image,
             transform(image)
             .unsqueeze(dim=0)
             .to(device)
         )
-    

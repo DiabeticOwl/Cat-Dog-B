@@ -1,7 +1,6 @@
 """
 Contains functionality for training and evaluating a deep learning model.
 """
-import numpy as np
 import pandas as pd
 import torch
 import torchmetrics
@@ -46,7 +45,7 @@ def training_loop(
 
         (0.1112, 0.8743, 10.256)
     """
-    
+
     model = model.to(device)
     metric_fn = metric_fn.to(device)
     train_loss, train_metric = 0, 0
@@ -55,25 +54,25 @@ def training_loop(
     # Looping through the training batch data.
     for X, y in data_loader:
         X, y = X.to(device), y.to(device)
-        
+
         model.train()
         y_pred = model(X)
-        
+
         loss = loss_fn(y_pred, y)
         train_loss += loss
         # argmax because y_pred are logits.
         train_metric += metric_fn(y_pred.argmax(dim=1), y) * 100
-        
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-           
+
     # We already have the sum of train loss per batch.
     # This value will correspond to the average train
     # loss per batch per epoch.
     train_loss /= len(data_loader)
-    train_metric /= len(data_loader) 
-    
+    train_metric /= len(data_loader)
+
     exp_end = timer()
     return (train_loss.item(),
             train_metric.item(),
@@ -98,7 +97,7 @@ def testing_loop(
         loss_fn: A PyTorch loss function to calculate loss on the test data.
         metric_fn: A Metric instance representing the metric function
             that will be used when training to calculate how good
-            the model's prediction are.       
+            the model's prediction are.
         device: A target device to compute on (e.g. "cuda" or "cpu").
     Returns:
         A tuple of testing loss, testing accuracy metrics and
@@ -108,26 +107,26 @@ def testing_loop(
 
         (0.0223, 0.8985, 5.312)
     """
-    
+
     model = model.to(device)
     metric_fn = metric_fn.to(device)
     test_loss, test_metric = 0, 0
     model.eval()
-    
+
     with torch.inference_mode():
         exp_start = timer()
         for X, y in data_loader:
             X, y = X.to(device), y.to(device)
-            
+
             test_y_pred = model(X)
-        
+
             test_loss += loss_fn(test_y_pred, y)
             test_metric += metric_fn(test_y_pred.argmax(dim=1), y) * 100
-            
+
         # test loss avg per batch per epoch.
         test_loss /= len(data_loader)
         test_metric /= len(data_loader)
-    
+
     exp_end = timer()
     return (test_loss.item(),
             test_metric.item(),
@@ -153,8 +152,8 @@ def train_model(
     A training section will be instructed upon the given model using both the
     training and testing data passed. The process will be repeated by epochs
     times, enhancing its ability to learn the patterns that the data has and
-    storing the expected evaluation metric results. These experiment results can
-    also be tracked using the writer optional parameter.
+    storing the expected evaluation metric results. These experiment results
+    can also be tracked using the writer optional parameter.
 
     Args:
         model: An instance of torch.nn.Module to be subject of learning.
@@ -178,8 +177,8 @@ def train_model(
             will be used.
         verbose: If 0, will print only the first and last epoch information.
             If greater than 0, the value set will be used to determine how much
-            epochs will be skipped. Example: With verbose = 5 this function will
-            print out each 5 epochs.
+            epochs will be skipped. Example: With verbose = 5 this function
+            will print out each 5 epochs.
         writer: Instance of SummaryWriter used for tracking the experiment.
 
     Returns:
@@ -188,7 +187,7 @@ def train_model(
     if random_seed:
         torch.manual_seed(random_seed)
         torch.cuda.manual_seed(random_seed)
-    
+
     exps_res = pd.DataFrame([])
     res_dict = {
         "train_loss": [],
@@ -198,7 +197,7 @@ def train_model(
         "test_loss": [],
         "test_epoch_runtime": []
     }
-    
+
     for epoch in tqdm(range(epochs)):
         (train_loss, train_metric,
          train_epoch_runtime) = training_loop(model,
@@ -214,14 +213,14 @@ def train_model(
                                             loss_fn,
                                             metric_fn,
                                             device)
-        
+
         res_dict['train_loss'].append(train_loss)
         res_dict['train_metric'].append(train_metric)
         res_dict['train_epoch_runtime'].append(train_epoch_runtime)
         res_dict['test_loss'].append(test_loss)
         res_dict['test_metric'].append(test_metric)
         res_dict['test_epoch_runtime'].append(test_epoch_runtime)
-       
+
         if writer:
             writer.add_scalars(main_tag='loss',
                                tag_scalar_dict={'train_loss': train_loss,
@@ -233,8 +232,8 @@ def train_model(
                                global_step=epoch)
             writer.close()
 
-        if (epoch == 0 or epoch + 1 == epochs or 
-            (verbose > 0 and epoch % verbose == 0)):
+        if (epoch == 0 or epoch + 1 == epochs or
+                (verbose > 0 and epoch % verbose == 0)):
             print(f"Epoch: {epoch + 1} | "
                   f"train_loss: {train_loss:.4f} | "
                   f"train_metric: {train_metric:.4f} | "
@@ -246,7 +245,7 @@ def train_model(
         exps_res['model_name'] = model.__class__.__name__
     else:
         exps_res['model_name'] = model_name
-        
+
     col_order = [
         'model_name',
         'train_loss',

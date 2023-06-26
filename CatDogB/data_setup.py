@@ -16,6 +16,7 @@ STANDARD_TRANSFORM = transforms.Compose([
     transforms.ToTensor()
 ])
 
+
 def _instantiate_dataloader(
         path: str | pathlib.Path,
         transform: transforms.Compose,
@@ -29,6 +30,7 @@ def _instantiate_dataloader(
                       num_workers=num_workers,
                       shuffle=shuffle,
                       pin_memory=True), None, data.classes
+
 
 def create_dataloaders(
     train_dir: Optional[str | pathlib.Path] = None,
@@ -49,7 +51,7 @@ def create_dataloaders(
         train_transform: Instance of torchvision.transforms used to perform
             transformations on the training data. By default a chain of
             Resize (with size of 244, 244) and ToTensor transformations is
-            used. 
+            used.
         test_transform: Instance of torchvision.transforms used to perform
             transformations on the testing data. If None the train_transform
             will be used instead.
@@ -57,7 +59,7 @@ def create_dataloaders(
             instances.
         num_workers: An integer for number of threads that will extract the
             batches from the DataLoaders instances.
-            
+
     Returns:
         A tuple conformed of the training and testing dataloader instances and
         a list of the target classes founded in the given data.
@@ -67,7 +69,9 @@ def create_dataloaders(
         If test_dir is not empty but train_dir is, only the test_dataloader
         will be returned.
         Example usage:
-            train_dataloader, test_dataloader, class_names = create_dataloaders(
+            (train_dataloader,
+             test_dataloader,
+             class_names) = create_dataloaders(
                 train_dir='train_dir',
                 test_dir='test_dir',
                 train_transform=transforms.Resize(),
