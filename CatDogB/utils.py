@@ -97,7 +97,7 @@ def plot_loss_curves(results: pd.DataFrame,
     plt.subplot(1, 2, 1)
     plt.plot(epochs, train_loss, label='train_loss')
     plt.plot(epochs, test_loss, label='test_loss')
-    plt.title('Loss')
+    plt.title('loss')
     plt.xlabel('Epochs')
     plt.ylim(0, 100)
     plt.legend()
