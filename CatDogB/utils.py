@@ -99,7 +99,6 @@ def plot_loss_curves(results: pd.DataFrame,
     plt.plot(epochs, test_loss, label='test_loss')
     plt.title('loss')
     plt.xlabel('Epochs')
-    plt.ylim(0, 100)
     plt.legend()
 
     # Plot metric

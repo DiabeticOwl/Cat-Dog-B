@@ -40,9 +40,9 @@ cats using the uppercase letter of the breed itself and the lowercase letter
 for dogs. After the breed name in this format an autoincrement identifier is
 appended.
 
-For the experimentations made on the final chosen model, and for further
-empathize the versatility of the model, data from 2 extra cat breeds were
-introduced. More breeds can be appended the same way.
+For the experimentations made on the final chosen model architecture, and for
+further empathize the versatility of the model, data from 2 extra cat breeds
+were introduced. More breeds can be appended the same way.
 The [American Shorthair](https://www.purina.com/cats/cat-breeds/american-shorthair)
 and [Turkish Van](https://www.hillspet.com/cat-care/cat-breeds/turkish-van)
 images were manually selected from these sites and visually discriminated by

@@ -41,4 +41,4 @@ described [here](https://github.com/DiabeticOwl/Cat-Dog-B/blob/main/experiments/
 A demo app was created using [Gradio](https://gradio.app/) and hosted on
 [Hugging Face](https://huggingface.co/) for public use.
 
-For trying this model please refer to [this]() url.
+For trying this model please refer to [this](https://huggingface.co/spaces/DiabeticOwl/BreedSpotter) url.
